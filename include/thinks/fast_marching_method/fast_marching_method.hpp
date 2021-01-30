@@ -46,6 +46,11 @@ namespace thinks {
 namespace fast_marching_method {
 namespace detail {
 
+// forward decls
+template<std::size_t N>
+void ThrowIfZeroElementInSize(std::array<std::size_t, N> const& size);
+
+
 //! Returns the product of the elements in array @a size.
 //! Note: Not checking for integer overflow here!
 template<std::size_t N>
@@ -903,7 +908,7 @@ DistanceGridIndexFromDilationGridIndex(
   std::array<std::int32_t, N> const& dilation_grid_index)
 {
   auto distance_grid_index = dilation_grid_index;
-  for_each(begin(distance_grid_index), end(distance_grid_index),
+  std::for_each(begin(distance_grid_index), end(distance_grid_index),
            [](auto& d) { d -= int32_t{1}; });
   return distance_grid_index;
 }
@@ -916,7 +921,7 @@ DilationGridIndexFromDistanceGridIndex(
   std::array<std::int32_t, N> const& distance_grid_index)
 {
   auto dilation_grid_index = distance_grid_index;
-  for_each(begin(dilation_grid_index), end(dilation_grid_index),
+  std::for_each(begin(dilation_grid_index), end(dilation_grid_index),
            [](auto& d) { d += int32_t{1}; assert(d >= int32_t{0}); });
   return dilation_grid_index;
 }
@@ -2024,7 +2029,7 @@ protected:
     std::array<T, N> const& grid_spacing,
     std::array<std::size_t, N> const& speed_grid_size,
     std::vector<T> const& speed_buffer)
-    : EikonalSolverBase(grid_spacing)
+    : EikonalSolverBase<T,N>(grid_spacing)
     , speed_grid_(speed_grid_size, speed_buffer)
   {
     for (auto const speed : speed_buffer) {
@@ -2075,8 +2080,8 @@ public:
     return detail::SolveEikonal(
       index,
       distance_grid,
-      uniform_speed(),
-      grid_spacing());
+      this->uniform_speed(),
+      this->grid_spacing());
   }
 };
 
@@ -2105,8 +2110,8 @@ public:
     return detail::HighAccuracySolveEikonal(
       index,
       distance_grid,
-      uniform_speed(),
-      grid_spacing());
+      this->uniform_speed(),
+      this->grid_spacing());
   }
 };
 
@@ -2136,8 +2141,8 @@ public:
     return detail::SolveEikonal(
       index,
       distance_grid,
-      Speed(index),
-      grid_spacing());
+      this->Speed(index),
+      this->grid_spacing());
   }
 };
 
@@ -2168,8 +2173,8 @@ public:
     return detail::HighAccuracySolveEikonal(
       index,
       distance_grid,
-      Speed(index),
-      grid_spacing());
+      this->Speed(index),
+      this->grid_spacing());
   }
 };
 
